@@ -14,11 +14,23 @@
                 </div>
             </div>
 
-            <aside class="cart-sidebar-wrapper">
-                <div class="cart-sidebar">
+            <!-- Mobile Cart Toggle Button -->
+            <div class="mobile-cart-toggle" id="mobileCartToggle">
+                <div class="cart-toggle-info">
+                    <span class="cart-toggle-count" id="mobileCartCount">0</span>
+                    <span class="cart-toggle-text">View Your Order</span>
+                </div>
+                <span class="cart-toggle-total" id="mobileCartTotal">€0.00</span>
+            </div>
+
+            <aside class="cart-sidebar-wrapper" id="cartSidebarWrapper">
+                <div class="cart-sidebar" id="cartSidebar">
                     <div class="cart-header">
                         <span id="cartTitle">Your Order</span>
-                        <span id="cartCount" class="badge">0</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span id="cartCount" class="badge">0</span>
+                            <button class="close-cart-btn" id="closeCartBtn"><i class="fas fa-times"></i></button>
+                        </div>
                     </div>
                     <div class="cart-items" id="cartItems">
                         <p style="text-align: center; color: #999; padding: 20px;" id="emptyMsg">Your cart is empty</p>
@@ -47,6 +59,12 @@
     </div>
 </main>
 
+<!-- Notification Toast -->
+<div id="notificationToast" class="notification-toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="notificationMessage">Item added to cart!</span>
+</div>
+
 <style>
     .menu-layout {
         display: grid;
@@ -55,23 +73,126 @@
         margin-bottom: 60px;
     }
 
+    /* Mobile Cart Toggle Styles */
+    .mobile-cart-toggle {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: var(--primary-color);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1002;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        cursor: pointer;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .cart-toggle-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .cart-toggle-count {
+        background: white;
+        color: var(--primary-color);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .cart-toggle-text {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .cart-toggle-total {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .close-cart-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--accent-color);
+        font-size: 20px;
+        cursor: pointer;
+    }
+
     @media (max-width: 1000px) {
         .menu-layout {
             grid-template-columns: 1fr;
         }
-        .cart-sidebar {
+        
+        .cart-sidebar-wrapper {
+            display: none; /* Hidden by default on mobile */
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .cart-sidebar-wrapper.active {
+            display: block;
+        }
+
+        .cart-sidebar {
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 1001;
-            max-height: 60vh;
-            border-radius: 20px 20px 0 0 !important;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            max-height: 85vh;
+            border-radius: 24px 24px 0 0 !important;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            padding: 25px;
+            animation: slideUp 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
         }
-        .cart-sidebar-wrapper {
-            height: 80px; /* Space for the fixed cart button on mobile */
+
+        .close-cart-btn {
+            display: block;
         }
+
+        .mobile-cart-toggle.active {
+            display: flex;
+        }
+    }
+
+    /* Notification Toast Styles */
+    .notification-toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: #27ae60;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 3000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .notification-toast.show {
+        transform: translateX(-50%) translateY(0);
     }
 
     .section-header {
@@ -217,9 +338,11 @@
         padding: 20px;
         border: 1px solid #ead8bd;
         box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        height: fit-content;
         position: sticky;
         top: 100px;
+        max-height: calc(100vh - 140px);
+        display: flex;
+        flex-direction: column;
     }
 
     .cart-header {
@@ -241,9 +364,9 @@
     }
 
     .cart-items {
-        max-height: 300px;
         overflow-y: auto;
         margin-bottom: 15px;
+        flex: 1;
     }
 
     .cart-item {
@@ -327,6 +450,11 @@
         margin-top: 10px;
         resize: vertical;
     }
+
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
 </style>
 
 <script>
@@ -341,6 +469,7 @@
             placeholder: "Example: Less spicy, no onion...",
             addToCart: "Add to Order",
             emptyCart: "Your cart is empty",
+            itemAdded: "Item added to cart!",
             sizes: [
                 ["Small", 0],
                 ["Medium", 3.00],
@@ -411,6 +540,7 @@
             placeholder: "Bijv: Minder pittig, geen ui...",
             addToCart: "Toevoegen",
             emptyCart: "Uw winkelwagen is leeg",
+            itemAdded: "Item toegevoegd aan winkelwagen!",
             sizes: [
                 ["Klein", 0],
                 ["Medium", 3.00],
@@ -552,6 +682,16 @@
         });
     }
 
+    function showNotification(message) {
+        const toast = document.getElementById('notificationToast');
+        const msgEl = document.getElementById('notificationMessage');
+        msgEl.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
     function addToCart(itemId) {
         const langData = menuData[currentLang];
         let item;
@@ -584,25 +724,32 @@
         };
 
         cart.push(cartItem);
+        localStorage.setItem('obd_cart', JSON.stringify(cart));
         updateCartUI();
+        showNotification(`${item.name} ${langData.itemAdded}`);
     }
 
     function updateCartUI() {
         const cartItemsContainer = document.getElementById('cartItems');
-        const emptyMsg = document.getElementById('emptyMsg');
         const cartCount = document.getElementById('cartCount');
+        const mobileCartCount = document.getElementById('mobileCartCount');
         const subtotalEl = document.getElementById('subtotalAmount');
         const vatEl = document.getElementById('vatAmount');
         const totalEl = document.getElementById('totalAmount');
+        const mobileCartTotal = document.getElementById('mobileCartTotal');
         const checkoutBtn = document.getElementById('checkoutBtn');
+        const mobileCartToggle = document.getElementById('mobileCartToggle');
 
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = `<p style="text-align: center; color: #999; padding: 20px;" id="emptyMsg">${menuData[currentLang].emptyCart}</p>`;
             cartCount.textContent = '0';
+            mobileCartCount.textContent = '0';
             subtotalEl.textContent = '€0.00';
             vatEl.textContent = '€0.00';
             totalEl.textContent = '€0.00';
+            mobileCartTotal.textContent = '€0.00';
             checkoutBtn.disabled = true;
+            mobileCartToggle.classList.remove('active');
             return;
         }
 
@@ -629,19 +776,52 @@
         const grandTotal = subtotal + vatAmount;
 
         cartCount.textContent = cart.length;
+        mobileCartCount.textContent = cart.length;
         subtotalEl.textContent = `€${subtotal.toFixed(2)}`;
         vatEl.textContent = `€${vatAmount.toFixed(2)}`;
         totalEl.textContent = `€${grandTotal.toFixed(2)}`;
+        mobileCartTotal.textContent = `€${grandTotal.toFixed(2)}`;
         checkoutBtn.disabled = false;
+        mobileCartToggle.classList.add('active');
     }
 
     function removeFromCart(index) {
         cart.splice(index, 1);
+        localStorage.setItem('obd_cart', JSON.stringify(cart));
         updateCartUI();
     }
 
+    // Checkout Logic
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+        window.location.href = 'checkout.php';
+    });
+
+    // Mobile Cart Interactions
+    const mobileCartToggle = document.getElementById('mobileCartToggle');
+    const cartSidebarWrapper = document.getElementById('cartSidebarWrapper');
+    const closeCartBtn = document.getElementById('closeCartBtn');
+
+    mobileCartToggle.addEventListener('click', () => {
+        cartSidebarWrapper.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    });
+
+    closeCartBtn.addEventListener('click', () => {
+        cartSidebarWrapper.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+    });
+
+    cartSidebarWrapper.addEventListener('click', (e) => {
+        if (e.target === cartSidebarWrapper) {
+            cartSidebarWrapper.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
     // Initialize
+    cart = JSON.parse(localStorage.getItem('obd_cart')) || [];
     renderMenu();
+    updateCartUI();
 </script>
 
 <?php include 'includes/footer.php'; ?>
