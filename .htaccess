@@ -2,3 +2,5 @@
 <Files ~ "^\.env">
     Require all denied
 </Files>
+
+##
