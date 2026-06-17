@@ -33,32 +33,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle Online Payments (iDEAL or Credit Card)
     try {
-        /* 
-        MOLLIE INTEGRATION LOGIC:
-        
-        $payment = $mollie->payments->create([
-            "amount" => [
-                "currency" => "EUR",
-                "value" => number_format($total_amount, 2, '.', '')
+        // Map payment methods to Mollie expected values
+        $mollieMethod = null;
+        if ($payment_method === 'ideal') {
+            $mollieMethod = 'ideal';
+        } elseif ($payment_method === 'card') {
+            $mollieMethod = 'creditcard';
+        }
+
+        $redirectUrl = SITE_URL . "/success.php?order_id=" . $order_id;
+
+        // Create payment on Mollie using cURL (bypassing the need for Composer / SDK)
+        $url = 'https://api.mollie.com/v2/payments';
+        $payload = [
+            'amount' => [
+                'currency' => 'EUR',
+                'value' => number_format($total_amount, 2, '.', '')
             ],
-            "description" => "Order #" . $order_id . " - Old Dhaka Biryani",
-            "redirectUrl" => SITE_URL . "/success.php?order_id=" . $order_id,
-            "webhookUrl"  => SITE_URL . "/webhook.php",
-            "metadata" => [
-                "order_id" => $order_id,
-                "customer_details" => $data['customer'],
-                "cart" => $data['cart']
-            ],
-            "method" => ($payment_method === 'ideal' ? \Mollie\Api\Types\PaymentMethod::IDEAL : \Mollie\Api\Types\PaymentMethod::CREDITCARD)
+            'description' => 'Order #' . $order_id . ' - Old Dhaka Biryani',
+            'redirectUrl' => $redirectUrl,
+            'metadata' => [
+                'order_id' => $order_id
+            ]
+        ];
+
+        if ($mollieMethod) {
+            $payload['method'] = $mollieMethod;
+        }
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . MOLLIE_API_KEY,
+            'Content-Type: application/json'
         ]);
 
-        echo json_encode(['success' => true, 'redirectUrl' => $payment->getCheckoutUrl()]);
-        */
+        $responseJson = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        // MOCK RESPONSE for demo purposes
+        $response = json_decode($responseJson, true);
+
+        if ($httpCode !== 201) {
+            $errorMessage = $response['detail'] ?? ($response['title'] ?? 'Mollie API error');
+            throw new Exception($errorMessage);
+        }
+
+        $checkoutUrl = $response['_links']['checkout']['href'] ?? null;
+        if (!$checkoutUrl) {
+            throw new Exception('Mollie checkout URL not found in API response.');
+        }
+
         echo json_encode([
-            'success' => true, 
-            'redirectUrl' => 'https://www.mollie.com/checkout/mock-payment-page?amount=' . $total_amount
+            'success' => true,
+            'redirectUrl' => $checkoutUrl
         ]);
 
     } catch (Exception $e) {
