@@ -31,22 +31,36 @@ if (file_exists($envFile)) {
     }
 }
 
+// Helper function to safely read environment variables (handles cases where putenv() is disabled on shared hosting)
+if (!function_exists('get_env_var')) {
+    function get_env_var($key, $default = '') {
+        if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+            return $_ENV[$key];
+        }
+        if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+            return $_SERVER[$key];
+        }
+        $val = getenv($key);
+        return ($val !== false && $val !== '') ? $val : $default;
+    }
+}
+
 // 1. Mollie API Settings
-define('MOLLIE_API_KEY', getenv('MOLLIE_API_KEY') ?: '');
+define('MOLLIE_API_KEY', get_env_var('MOLLIE_API_KEY'));
 
 // 2. Email Settings (SMTP)
-define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
-define('SMTP_PORT', (int)(getenv('SMTP_PORT') ?: 587));
-define('SMTP_USER', getenv('SMTP_USER') ?: '');
-define('SMTP_PASS', getenv('SMTP_PASS') ?: '');
-define('ADMIN_EMAIL', getenv('ADMIN_EMAIL') ?: '');
+define('SMTP_HOST', get_env_var('SMTP_HOST', 'smtp.gmail.com'));
+define('SMTP_PORT', (int)get_env_var('SMTP_PORT', 587));
+define('SMTP_USER', get_env_var('SMTP_USER'));
+define('SMTP_PASS', get_env_var('SMTP_PASS'));
+define('ADMIN_EMAIL', get_env_var('ADMIN_EMAIL'));
 
 // 3. WhatsApp Settings (Using a service like UltraMsg or Twilio)
-define('WHATSAPP_API_URL', getenv('WHATSAPP_API_URL') ?: '');
-define('WHATSAPP_TOKEN', getenv('WHATSAPP_TOKEN') ?: '');
-define('ADMIN_WHATSAPP', getenv('ADMIN_WHATSAPP') ?: '');
+define('WHATSAPP_API_URL', get_env_var('WHATSAPP_API_URL'));
+define('WHATSAPP_TOKEN', get_env_var('WHATSAPP_TOKEN'));
+define('ADMIN_WHATSAPP', get_env_var('ADMIN_WHATSAPP'));
 
 // 4. General Settings
-define('SITE_URL', getenv('SITE_URL') ?: 'http://yourdomain.com/old_dhaka_biryani');
+define('SITE_URL', get_env_var('SITE_URL', 'https://olddhakabiryani.site.je/'));
 define('VAT_RATE', 0.09);
 ?>
