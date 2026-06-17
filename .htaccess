@@ -1,0 +1,8 @@
+# Disable directory browsing
+Options -Indexes
+
+# Protect .env files from public browser access
+Files ~ "^\.env">
+    Order allow,deny
+    Deny from all
+</Files>
