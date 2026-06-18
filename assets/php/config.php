@@ -55,9 +55,11 @@ define('SMTP_USER', get_env_var('SMTP_USER'));
 define('SMTP_PASS', get_env_var('SMTP_PASS'));
 define('ADMIN_EMAIL', get_env_var('ADMIN_EMAIL'));
 
-// 3. WhatsApp Settings (Using a service like UltraMsg or Twilio)
-define('WHATSAPP_API_URL', get_env_var('WHATSAPP_API_URL'));
-define('WHATSAPP_TOKEN', get_env_var('WHATSAPP_TOKEN'));
+// 3. WhatsApp Settings (Meta WhatsApp Business Cloud API)
+define('WHATSAPP_PHONE_NUMBER_ID', get_env_var('WHATSAPP_PHONE_NUMBER_ID'));
+define('WHATSAPP_ACCESS_TOKEN', get_env_var('WHATSAPP_ACCESS_TOKEN'));
+define('WHATSAPP_APP_ID', get_env_var('WHATSAPP_APP_ID'));
+define('WHATSAPP_APP_SECRET', get_env_var('WHATSAPP_APP_SECRET'));
 define('ADMIN_WHATSAPP', get_env_var('ADMIN_WHATSAPP'));
 
 // 4. General Settings

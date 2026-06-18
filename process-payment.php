@@ -1,6 +1,10 @@
 <?php
 require_once 'assets/php/config.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // In a real scenario, you'd use Composer to load Mollie: 
 // require "vendor/autoload.php";
 // $mollie = new \Mollie\Api\MollieApiClient();
@@ -22,8 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle Cash or Card on Delivery (No online payment needed)
     if ($payment_method === 'cash_on_delivery' || $payment_method === 'card_on_delivery') {
-        // Here you would save the order to a database
-        // For this demo, we'll simulate success
+        $orderData = [
+            'order_id' => $order_id,
+            'customer' => $data['customer'],
+            'cart' => $data['cart'],
+            'total' => $total_amount,
+            'order_type' => $data['order_type'],
+            'payment_method' => $payment_method
+        ];
+
+        require_once 'assets/php/notifications.php';
+        sendOrderNotifications($orderData);
+
+        $_SESSION['orders'][$order_id] = $orderData;
+        $_SESSION['orders'][$order_id]['notified'] = true;
+
         echo json_encode([
             'success' => true,
             'redirectUrl' => 'success.php?order_id=' . $order_id . '&type=offline'
@@ -85,6 +102,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$checkoutUrl) {
             throw new Exception('Mollie checkout URL not found in API response.');
         }
+
+        // Save order data to session (online payment verification required on success page)
+        $_SESSION['orders'][$order_id] = [
+            'order_id' => $order_id,
+            'customer' => $data['customer'],
+            'cart' => $data['cart'],
+            'total' => $total_amount,
+            'order_type' => $data['order_type'],
+            'payment_method' => $payment_method,
+            'payment_id' => $response['id'],
+            'notified' => false
+        ];
 
         echo json_encode([
             'success' => true,
