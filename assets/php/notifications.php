@@ -365,8 +365,20 @@ HTML;
 
     // 4. Send WhatsApp (Meta Business Cloud API)
     if (!empty(WHATSAPP_PHONE_NUMBER_ID) && !empty(WHATSAPP_ACCESS_TOKEN) && !empty(ADMIN_WHATSAPP)) {
+        $logFile = __DIR__ . '/whatsapp_error.log';
+        
+        if (!function_exists('curl_init')) {
+            error_log("WhatsApp API failed: curl extension is not installed/enabled.");
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Error: curl extension is not installed/enabled.\n", FILE_APPEND);
+            return;
+        }
+
         // Strip out non-numeric characters from the admin's phone number
         $cleanPhone = preg_replace('/\D/', '', ADMIN_WHATSAPP);
+        // Remove leading '00' if present
+        if (strpos($cleanPhone, '00') === 0) {
+            $cleanPhone = substr($cleanPhone, 2);
+        }
 
         $params = array(
             'messaging_product' => 'whatsapp',
@@ -393,17 +405,34 @@ HTML;
                 "Authorization: Bearer " . WHATSAPP_ACCESS_TOKEN,
                 "Content-Type: application/json"
             ),
+            CURLOPT_SSL_VERIFYPEER => false, // Bypass SSL certificate verification for robustness on shared hosting
         ));
         
         $whatsapp_response = curl_exec($curl);
         $whatsapp_http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
         
-        if ($whatsapp_http_code !== 200) {
+        if ($whatsapp_response === false) {
+            $curl_error = curl_error($curl);
+            error_log("WhatsApp Curl Error: " . $curl_error);
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Curl Error: " . $curl_error . "\n", FILE_APPEND);
+        } else if ($whatsapp_http_code !== 200) {
             error_log("WhatsApp Cloud API failed (HTTP $whatsapp_http_code): " . $whatsapp_response);
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] API Error (HTTP $whatsapp_http_code): " . $whatsapp_response . "\n", FILE_APPEND);
+        } else {
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Message sent successfully. Response: " . $whatsapp_response . "\n", FILE_APPEND);
         }
+        
+        curl_close($curl);
     } else {
-        error_log("WhatsApp API skipped: WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ACCESS_TOKEN, or ADMIN_WHATSAPP is not configured.");
+        $logFile = __DIR__ . '/whatsapp_error.log';
+        $missing = [];
+        if (empty(WHATSAPP_PHONE_NUMBER_ID)) $missing[] = 'WHATSAPP_PHONE_NUMBER_ID';
+        if (empty(WHATSAPP_ACCESS_TOKEN)) $missing[] = 'WHATSAPP_ACCESS_TOKEN';
+        if (empty(ADMIN_WHATSAPP)) $missing[] = 'ADMIN_WHATSAPP';
+        $missingStr = implode(', ', $missing);
+        
+        error_log("WhatsApp API skipped: $missingStr not configured.");
+        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Skipped: $missingStr is not configured.\n", FILE_APPEND);
     }
 }
 ?>
