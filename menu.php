@@ -665,7 +665,7 @@
                         <div class="section-title-sm">${langData.extrasTitle}</div>
                         ${item.extras.map((extra, idx) => `
                             <label>
-                                <span><input type="radio" name="extra-${item.id}" value="${extra[1]}" ${idx === 0 ? 'checked' : ''}> ${extra[0]}</span>
+                                <span><input type="checkbox" name="extra-${item.id}" value="${extra[1]}" data-label="${extra[0]}"> ${extra[0]}</span>
                                 <span>+€${extra[1].toFixed(2)}</span>
                             </label>
                         `).join('')}
@@ -702,15 +702,25 @@
 
         const sizeRadio = document.querySelector(`input[name="size-${itemId}"]:checked`);
         const spiceRadio = document.querySelector(`input[name="spice-${itemId}"]:checked`);
-        const extraRadio = document.querySelector(`input[name="extra-${itemId}"]:checked`);
+        const extraCheckboxes = document.querySelectorAll(`input[name="extra-${itemId}"]:checked`);
         const note = document.getElementById(`note-${itemId}`).value;
 
         const sizePrice = sizeRadio ? parseFloat(sizeRadio.value) : 0;
-        const extraPrice = extraRadio ? parseFloat(extraRadio.value) : 0;
+        
+        // Calculate total extra price and collect extra names
+        let extraPrice = 0;
+        let extraNames = [];
+        extraCheckboxes.forEach(checkbox => {
+            extraPrice += parseFloat(checkbox.value);
+            const label = checkbox.getAttribute('data-label');
+            if (label !== 'None' && label !== 'Geen') {
+                extraNames.push(label);
+            }
+        });
         
         const sizeName = sizeRadio ? sizeRadio.parentElement.textContent.trim().split('+')[0] : '';
         const spiceName = spiceRadio ? spiceRadio.parentElement.textContent.trim() : '';
-        const extraName = extraRadio ? extraRadio.parentElement.textContent.trim().split('+')[0] : '';
+        const extraName = extraNames.length > 0 ? extraNames.join(', ') : '';
 
         const cartItem = {
             id: Date.now(),
@@ -719,7 +729,7 @@
             sizePrice: sizePrice,
             extraPrice: extraPrice,
             totalPrice: item.price + sizePrice + extraPrice,
-            details: `${sizeName ? sizeName + ', ' : ''}${spiceName}${extraName !== 'None' && extraName !== 'Geen' ? ', ' + extraName : ''}`,
+            details: `${sizeName ? sizeName + ', ' : ''}${spiceName}${extraName ? ', ' + extraName : ''}`,
             note: note
         };
 

@@ -193,25 +193,48 @@ function sendOrderNotifications($orderData) {
     foreach ($cart as $item) {
         $itemPrice = floatval($item['totalPrice'] ?? 0);
         $subtotal += $itemPrice;
-        $itemName = htmlspecialchars($item['name'] ?? '');
-        $itemDetails = htmlspecialchars($item['details'] ?? '');
+        $itemName = $item['name'] ?? '';
+        $itemDetails = $item['details'] ?? '';
         
-        $details .= "- $itemName ($itemDetails) x 1: €" . number_format($itemPrice, 2) . "\n";
+        // Format the structured details for WhatsApp
+        $details .= "🟢 *$itemName*\n";
+        
+        // Prepare structured HTML for email
+        $structuredHtml = '';
+        
+        // Split details by comma if they exist (usually: Size, Spice, Extras)
+        if (!empty($itemDetails)) {
+            $parts = explode(',', $itemDetails);
+            $labels = ['Size', 'Spice Level', 'EXTRAS'];
+            foreach ($parts as $index => $part) {
+                $label = $labels[$index] ?? 'Details';
+                $trimmedPart = trim($part);
+                
+                // For WhatsApp
+                $details .= "   *$label:* " . $trimmedPart . "\n";
+                
+                // For Email
+                $structuredHtml .= '<div class="item-spec"><strong>' . $label . ':</strong> ' . htmlspecialchars($trimmedPart) . '</div>';
+            }
+        }
+        
+        $details .= "   *x 1:* €" . number_format($itemPrice, 2) . "\n";
         
         $noteHtml = '';
         if (!empty($item['note'])) {
-            $details .= "  Note: " . $item['note'] . "\n";
-            $noteHtml = '<div class="item-note">Note: ' . htmlspecialchars($item['note']) . '</div>';
+            $details .= "\n   🟠 *NOTE: " . strtoupper($item['note']) . "* 🟠\n";
+            $noteHtml = '<div class="item-note" style="color: #d35400; font-weight: bold; margin-top: 5px;">🟠 NOTE: ' . htmlspecialchars(strtoupper($item['note'])) . ' 🟠</div>';
         }
+        $details .= "\n";
 
         $itemsHtml .= '
         <tr>
             <td>
-                <strong>' . $itemName . '</strong>
-                <div class="item-spec">' . $itemDetails . '</div>
+                <div style="font-size: 16px; margin-bottom: 5px;"><strong>🟢 ' . htmlspecialchars($itemName) . '</strong></div>
+                ' . $structuredHtml . '
                 ' . $noteHtml . '
             </td>
-            <td style="text-align: right; font-weight: bold; vertical-align: middle;">€' . number_format($itemPrice, 2) . '</td>
+            <td style="text-align: right; font-weight: bold; vertical-align: middle; font-size: 16px;">€' . number_format($itemPrice, 2) . '</td>
         </tr>';
     }
     
