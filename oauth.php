@@ -1,10 +1,22 @@
 <?php
 require_once 'assets/php/config.php';
 
-// Dynamically determine the redirect URI pointing back to this file
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ? "https://" : "http://";
-$host = $_SERVER['HTTP_HOST'];
-$redirectUri = $protocol . $host . strtok($_SERVER["REQUEST_URI"], '?');
+// Determine the redirect URI
+// Priority: 1. Environment variable, 2. Dynamic detection
+$redirectUri = get_env_var('WHATSAPP_REDIRECT_URI');
+
+if (empty($redirectUri)) {
+    // Robust protocol detection (handles reverse proxies)
+    $protocol = 'http://';
+    if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
+        $_SERVER['SERVER_PORT'] == 443 || 
+        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
+        $protocol = 'https://';
+    }
+    
+    $host = $_SERVER['HTTP_HOST'];
+    $redirectUri = $protocol . $host . strtok($_SERVER["REQUEST_URI"], '?');
+}
 
 // Config path for .env file
 $envFilePath = __DIR__ . '/.env';
