@@ -164,10 +164,20 @@ function sendOrderNotifications($orderData) {
     $customerPhone = $customer['phone'] ?? 'N/A';
     $orderType = strtolower($orderData['order_type'] ?? 'pickup');
     
+    $paymentMethod = $orderData['payment_method'] ?? 'cash_on_delivery';
+    $paymentMethodLabels = [
+        'ideal' => '💳 iDEAL / Wero (Paid)',
+        'card' => '💳 Credit Card (Paid)',
+        'cash_on_delivery' => '💵 Cash on Delivery (COD)',
+        'card_on_delivery' => '💳 Card on Delivery (COD)'
+    ];
+    $paymentLabel = $paymentMethodLabels[$paymentMethod] ?? ucfirst(str_replace('_', ' ', $paymentMethod));
+
     $details = "Order ID: #$orderId\n";
     $details .= "Customer: $customerName\n";
     $details .= "Phone: $customerPhone\n";
     $details .= "Type: " . strtoupper($orderType) . "\n";
+    $details .= "Payment: " . $paymentLabel . "\n";
     
     if ($orderType === 'delivery') {
         $details .= "Address: " . ($customer['address'] ?? '') . ", " . ($customer['city'] ?? '') . " (" . ($customer['postal_code'] ?? '') . ")\n";
