@@ -58,6 +58,11 @@ define('ADMIN_EMAIL', get_env_var('ADMIN_EMAIL'));
 // 3. Telegram Settings
 define('TELEGRAM_BOT_TOKEN', get_env_var('TELEGRAM_BOT_TOKEN'));
 define('TELEGRAM_CHAT_ID', get_env_var('TELEGRAM_CHAT_ID'));
+$telegramBase = get_env_var('TELEGRAM_API_BASE', 'https://api.telegram.org/');
+if (substr($telegramBase, -1) !== '/') {
+    $telegramBase .= '/';
+}
+define('TELEGRAM_API_BASE', $telegramBase);
 
 // 4. General Settings
 define('SITE_URL', get_env_var('SITE_URL', 'https://olddhakabiryani.site.je/'));

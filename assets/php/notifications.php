@@ -414,7 +414,7 @@ HTML;
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.telegram.org/bot" . TELEGRAM_BOT_TOKEN . "/sendMessage",
+            CURLOPT_URL => TELEGRAM_API_BASE . "bot" . TELEGRAM_BOT_TOKEN . "/sendMessage",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
