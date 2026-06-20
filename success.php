@@ -50,7 +50,7 @@ include 'includes/header.php';
             <i class="fas fa-check-circle" style="font-size: 80px; color: #27ae60; margin-bottom: 20px;"></i>
             <h1 style="color: var(--accent-color); margin-bottom: 10px;">Thank You for Your Order!</h1>
             <p style="font-size: 18px; color: #666; margin-bottom: 30px;">Your order <strong>#<?php echo htmlspecialchars($order_id ?? 'N/A'); ?></strong> has been received and is being prepared with love.</p>
-            <p style="color: #888; margin-bottom: 40px;">A confirmation has been sent to our kitchen. You will receive updates via WhatsApp/Phone shortly.</p>
+            <p style="color: #888; margin-bottom: 40px;">A confirmation has been sent to our kitchen. You will receive updates via Phone shortly.</p>
             <a href="index.php" class="btn">Return to Home</a>
         </div>
     </div>

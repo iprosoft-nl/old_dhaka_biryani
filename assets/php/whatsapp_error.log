@@ -1,5 +1,0 @@
-[2026-06-18 15:45:18] API Error (HTTP 401): {"error":{"message":"Authentication Error","code":190,"type":"OAuthException","fbtrace_id":"Ab_aj68CFrI4gSLYQh12OiE"}}
-[2026-06-19 08:31:49] API Error (HTTP 401): {"error":{"message":"Authentication Error","code":190,"type":"OAuthException","fbtrace_id":"AUVb4CtdqYW7Puz7Relg0G-"}}
-[2026-06-19 08:35:48] Message sent successfully. Response: {"messaging_product":"whatsapp","contacts":[{"input":"31627265759","wa_id":"31627265759"}],"messages":[{"id":"wamid.HBgLMzE2MjcyNjU3NTkVAgARGBI2RTIwOTE4MzAyMDA3RDI0RDcA"}]}
-[2026-06-19 08:55:11] Message sent successfully. Response: {"messaging_product":"whatsapp","contacts":[{"input":"31627265759","wa_id":"31627265759"}],"messages":[{"id":"wamid.HBgLMzE2MjcyNjU3NTkVAgARGBI3MzVFRjMxNzhFRjEzMUQ2MzQA"}]}
-[2026-06-19 09:05:13] Message sent successfully. Response: {"messaging_product":"whatsapp","contacts":[{"input":"31627265759","wa_id":"31627265759"}],"messages":[{"id":"wamid.HBgLMzE2MjcyNjU3NTkVAgARGBJBNTg1OTNGRUZDOTBEQ0YxMUEA"}]}

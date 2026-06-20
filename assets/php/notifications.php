@@ -152,14 +152,14 @@ function sendSmtpEmail($to, $subject, $messageHtml, $fromEmail, $fromName = 'Old
 }
 
 /**
- * Orchestrates order notifications (WhatsApp + HTML Email)
+ * Orchestrates order notifications (Telegram + HTML Email)
  */
 function sendOrderNotifications($orderData) {
     $orderId = $orderData['order_id'];
     $customer = $orderData['customer'];
     $cart = $orderData['cart'];
 
-    // 1. Build details for plain text (WhatsApp)
+    // 1. Build details for plain text (Telegram)
     $customerName = trim(($customer['first_name'] ?? '') . " " . ($customer['last_name'] ?? ''));
     $customerPhone = $customer['phone'] ?? 'N/A';
     $orderType = strtolower($orderData['order_type'] ?? 'pickup');
@@ -196,7 +196,7 @@ function sendOrderNotifications($orderData) {
         $itemName = $item['name'] ?? '';
         $itemDetails = $item['details'] ?? '';
         
-        // Format the structured details for WhatsApp
+        // Format the structured details for Telegram
         $details .= "🟢 *$itemName*\n";
         
         // Prepare structured HTML for email
@@ -210,7 +210,7 @@ function sendOrderNotifications($orderData) {
                 $label = $labels[$index] ?? 'Details';
                 $trimmedPart = trim($part);
                 
-                // For WhatsApp
+                // For Telegram
                 $details .= "   *$label:* " . $trimmedPart . "\n";
                 
                 // For Email
@@ -396,75 +396,58 @@ HTML;
         sendSmtpEmail(ADMIN_EMAIL, $subject, $emailHtml, ADMIN_EMAIL, 'Old Dhaka Biryani');
     }
 
-    // 4. Send WhatsApp (Meta Business Cloud API)
-    if (!empty(WHATSAPP_PHONE_NUMBER_ID) && !empty(WHATSAPP_ACCESS_TOKEN) && !empty(ADMIN_WHATSAPP)) {
-        $logFile = __DIR__ . '/whatsapp_error.log';
+    // 4. Send Telegram Notification
+    if (!empty(TELEGRAM_BOT_TOKEN) && !empty(TELEGRAM_CHAT_ID)) {
+        $logFile = __DIR__ . '/telegram_error.log';
         
         if (!function_exists('curl_init')) {
-            error_log("WhatsApp API failed: curl extension is not installed/enabled.");
+            error_log("Telegram API failed: curl extension is not installed/enabled.");
             file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Error: curl extension is not installed/enabled.\n", FILE_APPEND);
             return;
         }
 
-        // Strip out non-numeric characters from the admin's phone number
-        $cleanPhone = preg_replace('/\D/', '', ADMIN_WHATSAPP);
-        // Remove leading '00' if present
-        if (strpos($cleanPhone, '00') === 0) {
-            $cleanPhone = substr($cleanPhone, 2);
-        }
-
         $params = array(
-            'messaging_product' => 'whatsapp',
-            'recipient_type' => 'individual',
-            'to' => $cleanPhone,
-            'type' => 'text',
-            'text' => array(
-                'preview_url' => false,
-                'body' => "🔥 *New Order Received!*\n\n" . $details
-            )
+            'chat_id' => TELEGRAM_CHAT_ID,
+            'text' => "🔥 *New Order Received!*\n\n" . $details,
+            'parse_mode' => 'Markdown'
         );
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://graph.facebook.com/v20.0/" . WHATSAPP_PHONE_NUMBER_ID . "/messages",
+            CURLOPT_URL => "https://api.telegram.org/bot" . TELEGRAM_BOT_TOKEN . "/sendMessage",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode($params),
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer " . WHATSAPP_ACCESS_TOKEN,
-                "Content-Type: application/json"
-            ),
+            CURLOPT_POSTFIELDS => http_build_query($params),
             CURLOPT_SSL_VERIFYPEER => false, // Bypass SSL certificate verification for robustness on shared hosting
         ));
         
-        $whatsapp_response = curl_exec($curl);
-        $whatsapp_http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $telegram_response = curl_exec($curl);
+        $telegram_http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
-        if ($whatsapp_response === false) {
+        if ($telegram_response === false) {
             $curl_error = curl_error($curl);
-            error_log("WhatsApp Curl Error: " . $curl_error);
+            error_log("Telegram Curl Error: " . $curl_error);
             file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Curl Error: " . $curl_error . "\n", FILE_APPEND);
-        } else if ($whatsapp_http_code !== 200) {
-            error_log("WhatsApp Cloud API failed (HTTP $whatsapp_http_code): " . $whatsapp_response);
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] API Error (HTTP $whatsapp_http_code): " . $whatsapp_response . "\n", FILE_APPEND);
+        } else if ($telegram_http_code !== 200) {
+            error_log("Telegram API failed (HTTP $telegram_http_code): " . $telegram_response);
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] API Error (HTTP $telegram_http_code): " . $telegram_response . "\n", FILE_APPEND);
         } else {
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Message sent successfully. Response: " . $whatsapp_response . "\n", FILE_APPEND);
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Message sent successfully. Response: " . $telegram_response . "\n", FILE_APPEND);
         }
         
         curl_close($curl);
     } else {
-        $logFile = __DIR__ . '/whatsapp_error.log';
+        $logFile = __DIR__ . '/telegram_error.log';
         $missing = [];
-        if (empty(WHATSAPP_PHONE_NUMBER_ID)) $missing[] = 'WHATSAPP_PHONE_NUMBER_ID';
-        if (empty(WHATSAPP_ACCESS_TOKEN)) $missing[] = 'WHATSAPP_ACCESS_TOKEN';
-        if (empty(ADMIN_WHATSAPP)) $missing[] = 'ADMIN_WHATSAPP';
+        if (empty(TELEGRAM_BOT_TOKEN)) $missing[] = 'TELEGRAM_BOT_TOKEN';
+        if (empty(TELEGRAM_CHAT_ID)) $missing[] = 'TELEGRAM_CHAT_ID';
         $missingStr = implode(', ', $missing);
         
-        error_log("WhatsApp API skipped: $missingStr not configured.");
+        error_log("Telegram API skipped: $missingStr not configured.");
         file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Skipped: $missingStr is not configured.\n", FILE_APPEND);
     }
 }

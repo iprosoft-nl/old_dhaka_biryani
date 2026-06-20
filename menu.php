@@ -488,7 +488,7 @@
                             price: 13.95, 
                             image: "assets/img/chicken.jpg", 
                             desc: "Tender slow-cooked chicken layered with aromatic basmati rice, caramelized onions, and traditional Old Dhaka spices.",
-                            extras: [["None", 0], ["Extra Chicken", 3.50], ["Extra Rice", 2.00]]
+                            extras: [["Extra Chicken", 3.50], ["Extra Rice", 2.00]]
                         },
                         { 
                             id: 2,
@@ -496,7 +496,7 @@
                             price: 16.95, 
                             image: "assets/img/lamb.jpg", 
                             desc: "Tender slow-cooked lamb with saffron basmati rice, golden onions, and rich Old Dhaka flavors.",
-                            extras: [["None", 0], ["Extra Lamb", 4.50], ["Extra Rice", 2.00]]
+                            extras: [["Extra Lamb", 4.50], ["Extra Rice", 2.00]]
                         },
                         { 
                             id: 3,
@@ -504,7 +504,7 @@
                             price: 17.95, 
                             image: "assets/img/beef.jpg", 
                             desc: "Slow-braised beef layered with fragrant basmati rice and bold traditional Old Dhaka spices.",
-                            extras: [["None", 0], ["Extra Beef", 5.50], ["Extra Rice", 2.00]]
+                            extras: [["Extra Beef", 5.50], ["Extra Rice", 2.00]]
                         }
                     ]
                 },
@@ -518,7 +518,7 @@
                             price: 42.95, 
                             image: "assets/img/family-box.jpg", 
                             desc: "2 Chicken Biryani, 1 Lamb Biryani, 2 drinks.",
-                            extras: [["None", 0], ["Extra Chicken", 3.50], ["Extra Lamb", 4.50], ["Extra Rice", 2.00]]
+                            extras: [["Extra Chicken", 3.50], ["Extra Lamb", 4.50], ["Extra Rice", 2.00]]
                         },
                         { 
                             id: 5,
@@ -526,7 +526,7 @@
                             price: 15.95, 
                             image: "assets/img/student-deal.jpg", 
                             desc: "Chicken Biryani and 1 drink.",
-                            extras: [["None", 0], ["Extra Chicken", 3.50], ["Extra Rice", 2.00]]
+                            extras: [["Extra Chicken", 3.50], ["Extra Rice", 2.00]]
                         }
                     ]
                 }
@@ -559,7 +559,7 @@
                             price: 13.95, 
                             image: "assets/img/chicken.jpg", 
                             desc: "Malse langzaam gegaarde kip gelaagd met aromatische basmati rijst, gekarameliseerde uien en traditionele Old Dhaka kruiden.",
-                            extras: [["Geen", 0], ["Extra Kip", 3.50], ["Extra Rijst", 2.00]]
+                            extras: [["Extra Kip", 3.50], ["Extra Rijst", 2.00]]
                         },
                         { 
                             id: 2,
@@ -567,7 +567,7 @@
                             price: 16.95, 
                             image: "assets/img/lamb.jpg", 
                             desc: "Mals langzaam gegaard lamsvlees met saffraan basmati rijst, gouden uien en rijke Old Dhaka smaken.",
-                            extras: [["Geen", 0], ["Extra Lam", 4.50], ["Extra Rijst", 2.00]]
+                            extras: [["Extra Lam", 4.50], ["Extra Rijst", 2.00]]
                         },
                         { 
                             id: 3,
@@ -575,7 +575,7 @@
                             price: 17.95, 
                             image: "assets/img/beef.jpg", 
                             desc: "Langzaam gestoofd rundvlees gelaagd met geurige basmati rijst en krachtige traditionele Old Dhaka kruiden.",
-                            extras: [["Geen", 0], ["Extra Rund", 5.50], ["Extra Rijst", 2.00]]
+                            extras: [["Extra Rund", 5.50], ["Extra Rijst", 2.00]]
                         }
                     ]
                 },
@@ -589,7 +589,7 @@
                             price: 42.95, 
                             image: "assets/img/family-box.jpg", 
                             desc: "2 Kip Biryani, 1 Lams Biryani, 2 drankjes.",
-                            extras: [["Geen", 0], ["Extra Kip", 3.50], ["Extra Lam", 4.50], ["Extra Rijst", 2.00]]
+                            extras: [["Extra Kip", 3.50], ["Extra Lam", 4.50], ["Extra Rijst", 2.00]]
                         },
                         { 
                             id: 5,
@@ -597,7 +597,7 @@
                             price: 15.95, 
                             image: "assets/img/student-deal.jpg", 
                             desc: "Kip Biryani en 1 drankje.",
-                            extras: [["Geen", 0], ["Extra Kip", 3.50], ["Extra Rijst", 2.00]]
+                            extras: [["Extra Kip", 3.50], ["Extra Rijst", 2.00]]
                         }
                     ]
                 }
