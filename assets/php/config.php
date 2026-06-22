@@ -49,16 +49,19 @@ if (!function_exists('get_env_var')) {
 define('MOLLIE_API_KEY', get_env_var('MOLLIE_API_KEY'));
 
 // 2. Email Settings (SMTP)
-define('SMTP_HOST', get_env_var('SMTP_HOST', 'smtp.gmail.com'));
+define('SMTP_HOST', get_env_var('SMTP_HOST', ''));
 define('SMTP_PORT', (int)get_env_var('SMTP_PORT', 587));
 define('SMTP_USER', get_env_var('SMTP_USER'));
 define('SMTP_PASS', get_env_var('SMTP_PASS'));
 define('ADMIN_EMAIL', get_env_var('ADMIN_EMAIL'));
+// Set to true to bypass SMTP and use standard PHP mail() on AwardSpace
+define('FORCE_PHP_MAIL', true); 
 
 // 3. Telegram Settings
 define('TELEGRAM_BOT_TOKEN', get_env_var('TELEGRAM_BOT_TOKEN'));
 define('TELEGRAM_CHAT_ID', get_env_var('TELEGRAM_CHAT_ID'));
-$telegramBase = get_env_var('TELEGRAM_API_BASE', 'https://api.telegram.org/');
+// AwardSpace blocks api.telegram.org, so we use a proxy by default
+$telegramBase = get_env_var('TELEGRAM_API_BASE', 'https://api.telegram-proxy.org/');
 if (substr($telegramBase, -1) !== '/') {
     $telegramBase .= '/';
 }

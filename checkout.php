@@ -5,6 +5,17 @@
         <div class="checkout-layout">
             <div class="checkout-main">
                 <h1 class="checkout-title"><?php echo __('checkout_title'); ?></h1>
+
+                <!-- Returning Customer Banner -->
+                <div id="returningCustomerBanner" class="discount-banner" style="display: none;">
+                    <div class="banner-content">
+                        <img src="assets/img/discount-badge.png" alt="10% Discount" class="banner-badge">
+                        <div class="banner-text">
+                            <h3>Welcome Back!</h3>
+                            <p>As a valued returning customer, you've unlocked a <strong>10% Loyalty Discount</strong> on this order!</p>
+                        </div>
+                    </div>
+                </div>
                 
                 <form id="checkoutForm">
                     <!-- Order Type Selection -->
@@ -139,6 +150,10 @@
                             <span><?php echo __('subtotal'); ?></span>
                             <span id="subtotalAmount">€0.00</span>
                         </div>
+                        <div id="discountRow" class="summary-row" style="display: none; color: #27ae60; font-weight: bold;">
+                            <span>Returning Customer Discount (10%)</span>
+                            <span id="discountAmount">-€0.00</span>
+                        </div>
                         <div class="summary-row">
                             <span><?php echo __('vat'); ?></span>
                             <span id="vatAmount">€0.00</span>
@@ -159,6 +174,19 @@
     .checkout-layout { display: grid; grid-template-columns: 1fr 400px; gap: 40px; }
     .checkout-main { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     .checkout-title { font-size: 28px; margin-bottom: 30px; color: var(--accent-color); }
+    
+    /* Discount Banner Styles */
+    .discount-banner { background: linear-gradient(135deg, #fff9f4 0%, #fff0e6 100%); border: 2px dashed #e67e22; border-radius: 15px; padding: 20px; margin-bottom: 30px; position: relative; overflow: hidden; animation: pulse 2s infinite; }
+    .banner-content { display: flex; align-items: center; gap: 20px; position: relative; z-index: 1; }
+    .banner-badge { width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+    .banner-text h3 { margin: 0; color: #d35400; font-size: 20px; }
+    .banner-text p { margin: 5px 0 0; color: #555; font-size: 14px; }
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
+        70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+    }
+
     .checkout-section { margin-bottom: 40px; }
     .section-title-sm { font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     
@@ -243,8 +271,25 @@
                 cartItemsContainer.appendChild(itemEl);
             });
 
-            const vatAmount = subtotal * vatRate;
-            const grandTotal = subtotal + vatAmount;
+            // Apply 10% discount if order count > 0
+            const orderCount = parseInt(localStorage.getItem('obd_order_count') || '0');
+            let discountAmount = 0;
+            const discountRow = document.getElementById('discountRow');
+            const discountAmountEl = document.getElementById('discountAmount');
+
+            if (orderCount > 0) {
+                discountAmount = subtotal * 0.10;
+                discountRow.style.display = 'flex';
+                discountAmountEl.textContent = `-€${discountAmount.toFixed(2)}`;
+                document.getElementById('returningCustomerBanner').style.display = 'block';
+            } else {
+                discountRow.style.display = 'none';
+                document.getElementById('returningCustomerBanner').style.display = 'none';
+            }
+
+            const subtotalAfterDiscount = subtotal - discountAmount;
+            const vatAmount = subtotalAfterDiscount * vatRate;
+            const grandTotal = subtotalAfterDiscount + vatAmount;
 
             subtotalEl.textContent = `€${subtotal.toFixed(2)}`;
             vatEl.textContent = `€${vatAmount.toFixed(2)}`;
@@ -301,15 +346,19 @@
             const orderType = formData.get('order_type');
             const paymentMethod = formData.get('payment_method');
 
-            // Calculate totals
+            // Calculate totals with discount
             let subtotal = 0;
             cart.forEach(item => subtotal += item.totalPrice);
-            const total = subtotal + (subtotal * 0.09);
+            
+            const orderCount = parseInt(localStorage.getItem('obd_order_count') || '0');
+            const discount = orderCount > 0 ? (subtotal * 0.10) : 0;
+            const total = (subtotal - discount) + ((subtotal - discount) * 0.09);
 
             const orderPayload = {
                 customer: customerData,
                 cart: cart,
                 total: total,
+                discount: discount,
                 order_type: orderType,
                 payment_method: paymentMethod
             };

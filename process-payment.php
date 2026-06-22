@@ -41,6 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['orders'][$order_id] = $orderData;
         $_SESSION['orders'][$order_id]['notified'] = true;
 
+        // Save to file as fallback for session loss on AwardSpace
+        $orderDir = __DIR__ . '/assets/orders';
+        if (!is_dir($orderDir)) mkdir($orderDir, 0777, true);
+        file_put_contents($orderDir . '/order_' . $order_id . '.json', json_encode($_SESSION['orders'][$order_id]));
+
         echo json_encode([
             'success' => true,
             'redirectUrl' => 'success.php?order_id=' . $order_id . '&type=offline'
@@ -104,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Save order data to session (online payment verification required on success page)
-        $_SESSION['orders'][$order_id] = [
+        $orderData = [
             'order_id' => $order_id,
             'customer' => $data['customer'],
             'cart' => $data['cart'],
@@ -114,6 +119,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'payment_id' => $response['id'],
             'notified' => false
         ];
+        $_SESSION['orders'][$order_id] = $orderData;
+
+        // Save to file as fallback for session loss on AwardSpace
+        $orderDir = __DIR__ . '/assets/orders';
+        if (!is_dir($orderDir)) mkdir($orderDir, 0777, true);
+        file_put_contents($orderDir . '/order_' . $order_id . '.json', json_encode($orderData));
 
         echo json_encode([
             'success' => true,

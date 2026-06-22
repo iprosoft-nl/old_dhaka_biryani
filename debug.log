@@ -1,0 +1,17 @@
+[2026-06-21 16:19:08] Success page loaded for order: 1782058748
+[2026-06-21 16:19:08] Order data found in session. Notified status: YES
+[2026-06-21 16:23:01] Success page loaded for order: 1782058748
+[2026-06-21 16:23:01] Order data found in session. Notified status: YES
+[2026-06-21 16:23:01] Payment verification result: PAID
+[2026-06-21 16:23:01] Email send result: FAILED
+[2026-06-21 16:32:24] Success page loaded for order: 1782059544
+[2026-06-21 16:32:24] Order data found. Notified status: YES
+[2026-06-21 18:25:02] Success page loaded for order: 1782058748
+[2026-06-21 18:25:02] ERROR: Order ID not found in session.
+[2026-06-21 18:26:11] Success page loaded for order: 1781944618
+[2026-06-21 18:26:11] ERROR: Order ID not found in session.
+[2026-06-21 18:26:36] Success page loaded for order: 1782059544
+[2026-06-21 18:26:36] Order data recovered from file storage.
+[2026-06-21 18:26:36] Order data found. Notified status: YES
+[2026-06-22 09:58:25] Success page loaded for order: 1782122305
+[2026-06-22 09:58:25] Order data found. Notified status: YES

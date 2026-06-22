@@ -10,8 +10,9 @@ function sendSmtpEmail($to, $subject, $messageHtml, $fromEmail, $fromName = 'Old
     $user = SMTP_USER;
     $pass = SMTP_PASS;
 
-    // If SMTP variables are not fully configured, fallback to standard mail()
-    if (empty($host) || empty($user) || empty($pass)) {
+    // AwardSpace Free Hosting often blocks outgoing SMTP ports (587, 465).
+    // Standard mail() is usually the most reliable method on this platform.
+    if (empty($host) || empty($user) || empty($pass) || defined('FORCE_PHP_MAIL')) {
         $headers = "MIME-Version: 1.0\r\n" .
                    "Content-Type: text/html; charset=UTF-8\r\n" .
                    "From: " . $fromName . " <" . $fromEmail . ">\r\n" .
@@ -154,12 +155,11 @@ function sendSmtpEmail($to, $subject, $messageHtml, $fromEmail, $fromName = 'Old
 /**
  * Orchestrates order notifications (Telegram + HTML Email)
  */
-function sendOrderNotifications($orderData) {
+function buildOrderDetails($orderData) {
     $orderId = $orderData['order_id'];
     $customer = $orderData['customer'];
     $cart = $orderData['cart'];
 
-    // 1. Build details for plain text (Telegram)
     $customerName = trim(($customer['first_name'] ?? '') . " " . ($customer['last_name'] ?? ''));
     $customerPhone = $customer['phone'] ?? 'N/A';
     $orderType = strtolower($orderData['order_type'] ?? 'pickup');
@@ -187,6 +187,47 @@ function sendOrderNotifications($orderData) {
     }
     
     $details .= "\nItems:\n";
+    foreach ($cart as $item) {
+        $itemPrice = floatval($item['totalPrice'] ?? 0);
+        $itemName = $item['name'] ?? '';
+        $itemDetails = $item['details'] ?? '';
+        
+        $details .= "🟢 *$itemName*\n";
+        if (!empty($itemDetails)) {
+            $parts = explode(',', $itemDetails);
+            $labels = ['Size', 'Spice Level', 'EXTRAS'];
+            foreach ($parts as $index => $part) {
+                $label = $labels[$index] ?? 'Details';
+                $details .= "   *$label:* " . trim($part) . "\n";
+            }
+        }
+        $details .= "   *x 1:* €" . number_format($itemPrice, 2) . "\n";
+        if (!empty($item['note'])) {
+            $details .= "\n   🟠 *NOTE: " . strtoupper($item['note']) . "* 🟠\n";
+        }
+        $details .= "\n";
+    }
+    
+    $subtotal = 0;
+    foreach ($cart as $item) $subtotal += floatval($item['totalPrice'] ?? 0);
+    $vat = $subtotal * 0.09;
+    $grandTotal = $subtotal + $vat;
+    
+    $details .= "\nSubtotal: €" . number_format($subtotal, 2) . "\n";
+    $details .= "VAT (9%): €" . number_format($vat, 2) . "\n";
+    $details .= "Total: €" . number_format($grandTotal, 2);
+    return $details;
+}
+
+function sendOrderNotifications($orderData) {
+    $orderId = $orderData['order_id'];
+    $customer = $orderData['customer'];
+    $cart = $orderData['cart'];
+
+    $customerName = trim(($customer['first_name'] ?? '') . " " . ($customer['last_name'] ?? ''));
+    $customerPhone = $customer['phone'] ?? 'N/A';
+    $orderType = strtolower($orderData['order_type'] ?? 'pickup');
+    
     $subtotal = 0;
     $itemsHtml = '';
     
@@ -195,37 +236,21 @@ function sendOrderNotifications($orderData) {
         $subtotal += $itemPrice;
         $itemName = $item['name'] ?? '';
         $itemDetails = $item['details'] ?? '';
-        
-        // Format the structured details for Telegram
-        $details .= "🟢 *$itemName*\n";
-        
-        // Prepare structured HTML for email
         $structuredHtml = '';
         
-        // Split details by comma if they exist (usually: Size, Spice, Extras)
         if (!empty($itemDetails)) {
             $parts = explode(',', $itemDetails);
             $labels = ['Size', 'Spice Level', 'EXTRAS'];
             foreach ($parts as $index => $part) {
                 $label = $labels[$index] ?? 'Details';
-                $trimmedPart = trim($part);
-                
-                // For Telegram
-                $details .= "   *$label:* " . $trimmedPart . "\n";
-                
-                // For Email
-                $structuredHtml .= '<div class="item-spec"><strong>' . $label . ':</strong> ' . htmlspecialchars($trimmedPart) . '</div>';
+                $structuredHtml .= '<div class="item-spec"><strong>' . $label . ':</strong> ' . htmlspecialchars(trim($part)) . '</div>';
             }
         }
         
-        $details .= "   *x 1:* €" . number_format($itemPrice, 2) . "\n";
-        
         $noteHtml = '';
         if (!empty($item['note'])) {
-            $details .= "\n   🟠 *NOTE: " . strtoupper($item['note']) . "* 🟠\n";
             $noteHtml = '<div class="item-note" style="color: #d35400; font-weight: bold; margin-top: 5px;">🟠 NOTE: ' . htmlspecialchars(strtoupper($item['note'])) . ' 🟠</div>';
         }
-        $details .= "\n";
 
         $itemsHtml .= '
         <tr>
@@ -238,12 +263,8 @@ function sendOrderNotifications($orderData) {
         </tr>';
     }
     
-    $vat = $subtotal * 0.09;
-    $grandTotal = $subtotal + $vat;
-    
-    $details .= "\nSubtotal: €" . number_format($subtotal, 2) . "\n";
-    $details .= "VAT (9%): €" . number_format($vat, 2) . "\n";
-    $details .= "Total: €" . number_format($grandTotal, 2);
+    $vat = ($subtotal - $discount) * 0.09;
+    $grandTotal = ($subtotal - $discount) + $vat;
 
     // 2. Build HTML email template
     $orderTypeBadge = $orderType === 'delivery' 
@@ -285,6 +306,15 @@ function sendOrderNotifications($orderData) {
     $subtotalFormatted = number_format($subtotal, 2);
     $vatFormatted = number_format($vat, 2);
     $totalFormatted = number_format($grandTotal, 2);
+    $discountFormatted = number_format($discount, 2);
+    $discountHtmlEmail = '';
+    if ($discount > 0) {
+        $discountHtmlEmail = '
+        <div class="summary-row" style="color: #27ae60; font-weight: bold;">
+            <div class="summary-label">Discount (10%):</div>
+            <div class="summary-value">-€' . $discountFormatted . '</div>
+        </div>';
+    }
 
     $emailHtml = <<<HTML
 <!DOCTYPE html>
@@ -370,6 +400,7 @@ function sendOrderNotifications($orderData) {
                     <div class="summary-label">Subtotal:</div>
                     <div class="summary-value">€{$subtotalFormatted}</div>
                 </div>
+                {$discountHtmlEmail}
                 <div class="summary-row">
                     <div class="summary-label">VAT (9%):</div>
                     <div class="summary-value">€{$vatFormatted}</div>
@@ -396,59 +427,7 @@ HTML;
         sendSmtpEmail(ADMIN_EMAIL, $subject, $emailHtml, ADMIN_EMAIL, 'Old Dhaka Biryani');
     }
 
-    // 4. Send Telegram Notification
-    if (!empty(TELEGRAM_BOT_TOKEN) && !empty(TELEGRAM_CHAT_ID)) {
-        $logFile = __DIR__ . '/telegram_error.log';
-        
-        if (!function_exists('curl_init')) {
-            error_log("Telegram API failed: curl extension is not installed/enabled.");
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Error: curl extension is not installed/enabled.\n", FILE_APPEND);
-            return;
-        }
-
-        $params = array(
-            'chat_id' => TELEGRAM_CHAT_ID,
-            'text' => "🔥 *New Order Received!*\n\n" . $details,
-            'parse_mode' => 'Markdown'
-        );
-
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => TELEGRAM_API_BASE . "bot" . TELEGRAM_BOT_TOKEN . "/sendMessage",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => http_build_query($params),
-            CURLOPT_SSL_VERIFYPEER => false, // Bypass SSL certificate verification for robustness on shared hosting
-        ));
-        
-        $telegram_response = curl_exec($curl);
-        $telegram_http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        
-        if ($telegram_response === false) {
-            $curl_error = curl_error($curl);
-            error_log("Telegram Curl Error: " . $curl_error);
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Curl Error: " . $curl_error . "\n", FILE_APPEND);
-        } else if ($telegram_http_code !== 200) {
-            error_log("Telegram API failed (HTTP $telegram_http_code): " . $telegram_response);
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] API Error (HTTP $telegram_http_code): " . $telegram_response . "\n", FILE_APPEND);
-        } else {
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Message sent successfully. Response: " . $telegram_response . "\n", FILE_APPEND);
-        }
-        
-        curl_close($curl);
-    } else {
-        $logFile = __DIR__ . '/telegram_error.log';
-        $missing = [];
-        if (empty(TELEGRAM_BOT_TOKEN)) $missing[] = 'TELEGRAM_BOT_TOKEN';
-        if (empty(TELEGRAM_CHAT_ID)) $missing[] = 'TELEGRAM_CHAT_ID';
-        $missingStr = implode(', ', $missing);
-        
-        error_log("Telegram API skipped: $missingStr not configured.");
-        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Skipped: $missingStr is not configured.\n", FILE_APPEND);
-    }
+    // 4. Telegram Notification (Handled by Browser Trigger in success.php)
+    // Server-side Telegram is disabled on AwardSpace due to outgoing connection blocks.
 }
 ?>
