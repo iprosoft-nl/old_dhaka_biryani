@@ -529,6 +529,84 @@
                             extras: [["Extra Chicken", 3.50], ["Extra Rice", 2.00]]
                         }
                     ]
+                },
+                {
+                    title: "DRINKS",
+                    showSize: true,
+                    items: [
+                        { 
+                            id: 6,
+                            name: "Coca-Cola", 
+                            price: 2.00, 
+                            image: "assets/img/coca-cola.png", 
+                            desc: "Classic cola beverage with refreshing taste available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 7,
+                            name: "Coca-Cola Zero", 
+                            price: 2.00, 
+                            image: "assets/img/coca-cola-zero.png", 
+                            desc: "Zero sugar cola with the same great taste available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 8,
+                            name: "Sprite", 
+                            price: 2.00, 
+                            image: "assets/img/sprite.png", 
+                            desc: "Crisp lemon-lime flavored soft drink available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 9,
+                            name: "Fanta (Orange)", 
+                            price: 2.00, 
+                            image: "assets/img/fanta.png", 
+                            desc: "Delicious orange flavored soft drink available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 10,
+                            name: "Pepsi", 
+                            price: 2.00, 
+                            image: "assets/img/pepsi.png", 
+                            desc: "Bold cola taste with a smooth finish available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 11,
+                            name: "Pepsi Max", 
+                            price: 2.00, 
+                            image: "assets/img/pepsi-max.png", 
+                            desc: "Maximum taste with no sugar cola available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 12,
+                            name: "7 UP", 
+                            price: 2.00, 
+                            image: "assets/img/7up.png", 
+                            desc: "Crisp lemon-lime flavored beverage available in multiple sizes.",
+                            extras: [["330ml Can", 0], ["500ml Bottle", 0.80], ["1.5L Bottle", 2.00]]
+                        },
+                        { 
+                            id: 13,
+                            name: "Still Water", 
+                            price: 0, 
+                            image: "assets/img/still-water.png", 
+                            desc: "Pure natural mineral water available in multiple sizes.",
+                            extras: [["500ml Bottle", 0], ["1.5L Bottle", 1.00]]
+                        },
+                        { 
+                            id: 14,
+                            name: "Sparkling Water", 
+                            price: 0, 
+                            image: "assets/img/sparkling-water.png", 
+                            desc: "Refreshing sparkling mineral water available in multiple sizes.",
+                            extras: [["500ml Bottle", 0], ["1.5L Bottle", 1.00]]
+                        }
+                    ]
                 }
             ]
         },
@@ -600,6 +678,84 @@
                             extras: [["Extra Kip", 3.50], ["Extra Rijst", 2.00]]
                         }
                     ]
+                },
+                {
+                    title: "DRANKEN",
+                    showSize: true,
+                    items: [
+                        { 
+                            id: 6,
+                            name: "Coca-Cola", 
+                            price: 2.00, 
+                            image: "assets/img/coca-cola.png", 
+                            desc: "Klassieke coladrank met verfrissende smaak verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 7,
+                            name: "Coca-Cola Zero", 
+                            price: 2.00, 
+                            image: "assets/img/coca-cola-zero.png", 
+                            desc: "Suikervrije cola met dezelfde geweldige smaak verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 8,
+                            name: "Sprite", 
+                            price: 2.00, 
+                            image: "assets/img/sprite.png", 
+                            desc: "Frisse frisdrank met citroen-limoen smaak verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 9,
+                            name: "Fanta (Oranje)", 
+                            price: 2.00, 
+                            image: "assets/img/fanta.png", 
+                            desc: "Heerlijke frisdrank met sinaasappelsmaak verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 10,
+                            name: "Pepsi", 
+                            price: 2.00, 
+                            image: "assets/img/pepsi.png", 
+                            desc: "Sterke colasmaak met een gladde afwerking verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 11,
+                            name: "Pepsi Max", 
+                            price: 2.00, 
+                            image: "assets/img/pepsi-max.png", 
+                            desc: "Maximale smaak zonder suiker cola verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 12,
+                            name: "7 UP", 
+                            price: 2.00, 
+                            image: "assets/img/7up.png", 
+                            desc: "Frisse frisdrank met citroen-limoen smaak verkrijgbaar in meerdere maten.",
+                            extras: [["330ml Blikje", 0], ["500ml Fles", 0.80], ["1.5L Fles", 2.00]]
+                        },
+                        { 
+                            id: 13,
+                            name: "Bronwater", 
+                            price: 0, 
+                            image: "assets/img/still-water.png", 
+                            desc: "Zuiver natuurlijk mineraalwater verkrijgbaar in meerdere maten.",
+                            extras: [["500ml Fles", 0], ["1.5L Fles", 1.00]]
+                        },
+                        { 
+                            id: 14,
+                            name: "Bruisend Water", 
+                            price: 0, 
+                            image: "assets/img/sparkling-water.png", 
+                            desc: "Verfrissend bruisend mineraalwater verkrijgbaar in meerdere maten.",
+                            extras: [["500ml Fles", 0], ["1.5L Fles", 1.00]]
+                        }
+                    ]
                 }
             ]
         }
@@ -625,7 +781,8 @@
                 card.className = 'menu-card';
                 
                 let sizeHtml = '';
-                if (section.showSize) {
+                // Only show general sizes for non-drink items (showSize is used for biryani, not drinks)
+                if (section.showSize && section.title !== 'DRINKS' && section.title !== 'DRANKEN') {
                     sizeHtml = `
                         <div class="option-group">
                             <div class="section-title-sm">${langData.sizeTitle}</div>
@@ -652,6 +809,7 @@
                     
                     ${sizeHtml}
 
+                    ${section.showSize ? '' : `
                     <div class="option-group">
                         <div class="section-title-sm">${langData.spiceTitle}</div>
                         ${langData.spices.map((spice, idx) => `
@@ -660,12 +818,13 @@
                             </label>
                         `).join('')}
                     </div>
+                    `}
 
                     <div class="option-group">
-                        <div class="section-title-sm">${langData.extrasTitle}</div>
+                        <div class="section-title-sm">${section.showSize ? (currentLang === 'en' ? 'Size (Required)' : 'Grootte (Verplicht)') : langData.extrasTitle}</div>
                         ${item.extras.map((extra, idx) => `
                             <label>
-                                <span><input type="checkbox" name="extra-${item.id}" value="${extra[1]}" data-label="${extra[0]}"> ${extra[0]}</span>
+                                <span><input type="${section.showSize ? 'radio' : 'checkbox'}" name="${section.showSize ? 'size' : 'extra'}-${item.id}" value="${extra[1]}" data-label="${extra[0]}" ${section.showSize && idx === 0 ? 'checked' : ''}> ${extra[0]}</span>
                                 <span>+€${extra[1].toFixed(2)}</span>
                             </label>
                         `).join('')}
@@ -695,9 +854,22 @@
     function addToCart(itemId) {
         const langData = menuData[currentLang];
         let item;
-        for (const section of langData.sections) {
-            item = section.items.find(i => i.id === itemId);
-            if (item) break;
+        let section;
+        for (const s of langData.sections) {
+            item = s.items.find(i => i.id === itemId);
+            if (item) {
+                section = s;
+                break;
+            }
+        }
+
+        // For drinks, check if size is selected (required field)
+        if (section.showSize) {
+            const drinkSizeRadio = document.querySelector(`input[name="size-${itemId}"]:checked`);
+            if (!drinkSizeRadio) {
+                showNotification(currentLang === 'en' ? 'Please select a size' : 'Selecteer alstublieft een grootte');
+                return;
+            }
         }
 
         const sizeRadio = document.querySelector(`input[name="size-${itemId}"]:checked`);
